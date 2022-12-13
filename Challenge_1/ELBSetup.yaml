@@ -1,0 +1,54 @@
+Parameters:
+  NetworkStackName:
+    Description: VPC Stack Name to import the network details.
+    Type: String
+  WebServerStackName:
+    Description: Web Servers Stack Name to import the instance details for security group.
+    Type: String
+Resources:
+  ELBTargetGroup:
+   Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+   Properties:
+     HealthCheckIntervalSeconds: 6
+     HealthCheckTimeoutSeconds: 5
+     HealthyThresholdCount: 2
+     Port: 80
+     Protocol: HTTP
+     UnhealthyThresholdCount: 2
+     VpcId:
+       Fn::ImportValue:
+         Fn::Sub: "${NetworkStackName}-VPCID"
+     TargetType: instance
+     Targets:
+       - Id:
+           Fn::ImportValue:
+             Fn::Sub: "${WebServerStackName}-WebServer1"
+         Port: 80
+       - Id:
+           Fn::ImportValue:
+             Fn::Sub: "${WebServerStackName}-WebServer2"
+         Port: 80
+  ElasticLoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Subnets:
+        - Fn::ImportValue:
+            Fn::Sub: "${NetworkStackName}-LBSubnet1ID"
+        - Fn::ImportValue:
+            Fn::Sub: "${NetworkStackName}-LBSubnet2ID"
+        - Fn::ImportValue:
+            Fn::Sub: "${NetworkStackName}-WebAppSubnet1ID"
+        - Fn::ImportValue:
+            Fn::Sub: "${NetworkStackName}-WebAppSubnet2ID"
+      SecurityGroups:
+        - Fn::ImportValue:
+            Fn::Sub: "${NetworkStackName}-LoadBalancerSG"
+  ElbListener:
+   Type: 'AWS::ElasticLoadBalancingV2::Listener'
+   Properties:
+     DefaultActions:
+       - Type: forward
+         TargetGroupArn: !Ref ELBTargetGroup
+     LoadBalancerArn: !Ref ElasticLoadBalancer
+     Port: '80'
+     Protocol: HTTP
