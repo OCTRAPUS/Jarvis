@@ -1,0 +1,13 @@
+Resources:
+  PubPrivateVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+Outputs:
+  PubPrivateVPC:
+    Description: The VPC ID
+    Value:
+      Ref: PubPrivateVPC
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-VPCID'

@@ -1,0 +1,130 @@
+Resources:
+  DemoVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+  LoadBalancerSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref DemoVPC
+      AvailabilityZone: us-east-1a
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+  LoadBalancerSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref DemoVPC
+      AvailabilityZone: us-east-1b
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+  WebAppSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref DemoVPC
+      AvailabilityZone: us-east-1c
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+  WebAppSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref DemoVPC
+      AvailabilityZone: us-east-1d
+      CidrBlock: 10.0.4.0/24
+      MapPublicIpOnLaunch: false
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+  GatewayToInternet:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref DemoVPC
+      InternetGatewayId: !Ref InternetGateway
+  LoadBalancerRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref DemoVPC
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: GatewayToInternet
+    Properties:
+      RouteTableId: !Ref LoadBalancerRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  LBSubnet1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref LoadBalancerSubnet1
+      RouteTableId: !Ref LoadBalancerRouteTable
+  LBSubnet2RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref LoadBalancerSubnet2
+      RouteTableId: !Ref LoadBalancerRouteTable
+  WebAppRouteTableRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref DemoVPC
+  WebApp1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref WebAppSubnet1
+      RouteTableId: !Ref WebAppRouteTableRouteTable
+  WebApp2RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref WebAppSubnet2
+      RouteTableId: !Ref WebAppRouteTableRouteTable
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      GroupName: load-balancer-sg
+      VpcId:
+        Ref: DemoVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+Outputs:
+  DemoVPC:
+    Description: The VPC Id for my demo network
+    Value:
+      Ref: DemoVPC
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-VPCID'
+  LoadBalancerSubnet1:
+    Description: Public Subnet - 1 for load balancer
+    Value:
+      Ref: LoadBalancerSubnet1
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-LBSubnet1ID'
+  LoadBalancerSubnet2:
+    Description: Public Subnet - 2 for load balancer
+    Value:
+      Ref: LoadBalancerSubnet2
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-LBSubnet2ID'
+  WebAppSubnet1:
+    Description: Public Subnet - 2 for load balancer
+    Value:
+      Ref: WebAppSubnet1
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-WebAppSubnet1ID'
+  WebAppSubnet2:
+    Description: Public Subnet - 2 for load balancer
+    Value:
+      Ref: WebAppSubnet2
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-WebAppSubnet2ID'
+  LoadBalancerSecurityGroup:
+    Description: Load balancer security group id
+    Value:
+      Ref: LoadBalancerSecurityGroup
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-LoadBalancerSG'

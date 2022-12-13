@@ -1,0 +1,28 @@
+
+Parameters:
+  NetworkStackName:
+    Description: VPC Stack Name to get VPC ID.
+    Type: String
+
+Resources:
+  WebAppInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      SubnetId:
+        Fn::ImportValue:
+          Fn::Sub: "${NetworkStackName}-WebAppSubnet1ID"
+      ImageId: ami-0d5eff06f840b45e9 # ImageID valid only in us-east-1 region
+      InstanceType: t2.micro
+      KeyName: kpmg_challenge
+      SecurityGroupIds:
+        - Fn::ImportValue:
+           Fn::Sub: "${NetworkStackName}-LoadBalancerSG"
+
+Outputs:
+  WebAppInstance1:
+    Description: The Instance Id - 1
+    Value:
+      Ref: WebAppInstance1
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-WebIns1'
