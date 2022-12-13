@@ -1,7 +1,5 @@
 import requests
 import json
-from variables import data_list
-
 
 class ec2MetaData():
     def __init__(self):
