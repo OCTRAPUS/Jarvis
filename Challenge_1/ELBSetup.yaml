@@ -28,6 +28,9 @@ Resources:
            Fn::ImportValue:
              Fn::Sub: "${WebServerStackName}-WebServer2"
          Port: 80
+     Tags:
+       - Key: Name
+         Value: InterviewChallenge
   ElasticLoadBalancer:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
@@ -43,6 +46,9 @@ Resources:
       SecurityGroups:
         - Fn::ImportValue:
             Fn::Sub: "${NetworkStackName}-LoadBalancerSG"
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   ElbListener:
    Type: 'AWS::ElasticLoadBalancingV2::Listener'
    Properties:

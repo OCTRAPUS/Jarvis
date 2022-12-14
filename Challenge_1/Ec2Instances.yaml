@@ -8,27 +8,54 @@ Resources:
   WebAppInstance1:
     Type: AWS::EC2::Instance
     Properties:
-      SubnetId:
-        Fn::ImportValue:
-          Fn::Sub: "${NetworkStackName}-WebAppSubnet1ID"
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "True"
+          DeviceIndex : 0
+          SubnetId:
+            Fn::ImportValue:
+              Fn::Sub: "${NetworkStackName}-LBSubnet1ID"
+          GroupSet:
+            - Fn::ImportValue:
+                Fn::Sub: "${NetworkStackName}-LoadBalancerSG"
       ImageId: ami-0d5eff06f840b45e9 # ImageID valid only in us-east-1 region
       InstanceType: t2.micro
       KeyName: kpmg_challenge
-      SecurityGroupIds:
-        - Fn::ImportValue:
-           Fn::Sub: "${NetworkStackName}-LoadBalancerSG"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo su
+          yum update -y
+          yum install -y httpd.x86_64
+          systemctl start httpd.service
+          systemctl enable httpd.service
+          echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   WebAppInstance2:
     Type: AWS::EC2::Instance
     Properties:
       SubnetId:
         Fn::ImportValue:
-          Fn::Sub: "${NetworkStackName}-WebAppSubnet2ID"
-      ImageId: ami-0d5eff06f840b45e9 # ImageID valid only in us-east-1 region
+          Fn::Sub: "${NetworkStackName}-LBSubnet2ID"
+      ImageId: ami-0b0dcb5067f052a63 # ImageID valid only in us-east-1 region
       InstanceType: t2.micro
       KeyName: kpmg_challenge
       SecurityGroupIds:
         - Fn::ImportValue:
             Fn::Sub: "${NetworkStackName}-LoadBalancerSG"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo su
+          yum update -y
+          yum install -y httpd.x86_64
+          systemctl start httpd.service
+          systemctl enable httpd.service
+          echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+      Tags:
+       - Key: Name
+         Value: InterviewChallenge
 
 Outputs:
   WebAppInstance1:

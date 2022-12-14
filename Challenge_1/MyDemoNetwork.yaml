@@ -3,6 +3,9 @@ Resources:
     Type: 'AWS::EC2::VPC'
     Properties:
       CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   LoadBalancerSubnet1:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -10,6 +13,9 @@ Resources:
       AvailabilityZone: us-east-1a
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   LoadBalancerSubnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -17,6 +23,9 @@ Resources:
       AvailabilityZone: us-east-1b
       CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   WebAppSubnet1:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -24,6 +33,9 @@ Resources:
       AvailabilityZone: us-east-1c
       CidrBlock: 10.0.3.0/24
       MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   WebAppSubnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -31,6 +43,9 @@ Resources:
       AvailabilityZone: us-east-1d
       CidrBlock: 10.0.4.0/24
       MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
   GatewayToInternet:
@@ -42,6 +57,9 @@ Resources:
     Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref DemoVPC
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   PublicRoute:
     Type: 'AWS::EC2::Route'
     DependsOn: GatewayToInternet
@@ -63,6 +81,9 @@ Resources:
     Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref DemoVPC
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
   WebApp1RouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -85,6 +106,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: InterviewChallenge
 Outputs:
   DemoVPC:
     Description: The VPC Id for my demo network
